@@ -19,7 +19,7 @@ you.
 
 ## Inspiration
 
-The initial idea for this project came from seeing Kenny Vaden's generative-art work.
+The initial idea for this project came from seeing Kenny Vaden's art work on LinkedIn.
 If you enjoy these experiments, you should check them out on [LinkedIn](https://www.linkedin.com/search/results/people/?keywords=Kenny%20Vaden).
 
 ---
