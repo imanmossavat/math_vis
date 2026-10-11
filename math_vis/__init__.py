@@ -38,6 +38,10 @@ from .rendering import (
     render_stained_glass_crisp,
     render_glass_rose,
     ,
+    TILE_TEXT,
+    parse_tile,
+    rotate_tile,
+    tile_curve,
 )
 
 __all__ = [
@@ -80,4 +84,8 @@ __all__ = [
     "render_stained_glass_crisp",
     "render_glass_rose",
     "",
+    "TILE_TEXT",
+    "parse_tile",
+    "rotate_tile",
+    "tile_curve",
 ]

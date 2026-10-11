@@ -479,14 +479,13 @@ def render_stained_glass_crisp(
     )
     seeds = seeds_relaxed(n_cells, W, H, rng, iters=lloyd_iters)
     t_cell = cell_colors(seeds, W, H, rng, trend=trend, smooth=smooth, jitter=jitter)
-    return glass_crisp(
+    img = glass_crisp(
         seeds,
         t_cell,
         palette,
         W,
         H,
         rng=rng,
-        stages=stages,
         warp=warp,
         lead_px=lead_px,
         round_px=round_px,
@@ -495,6 +494,9 @@ def render_stained_glass_crisp(
         crack_alpha=crack_alpha,
         contour_alpha=contour_alpha,
     )
+    if stages:
+        return img
+    return finish(img, grain=grain, display=False)
 
 
 def render_glass_rose(
@@ -546,12 +548,9 @@ def render_glass_rose(
     yy, xx = np.mgrid[0:W, 0:W]
     mask = np.clip((0.47 * W - np.hypot(xx - W / 2, yy - H / 2)) / 3, 0, 1)[..., None]
     img = img * mask + np.array([14, 11, 18]) * (1 - mask)
-    if stages and isinstance(img, tuple):
-        # glass returned tuple; unpack and apply mask to final stage
-        arr, snap = img
-        snap["final"] = (arr * mask + np.array([14, 11, 18]) * (1 - mask)).astype(np.uint8)
-        return arr * mask + np.array([14, 11, 18]) * (1 - mask), snap
-    return img
+    if stages:
+        return img, {"final": img.astype(np.uint8)}
+    return finish(img, grain=grain, display=False)
 
 
 def (
