@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>math_vis gallery</title>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 2rem; background: #0b0d14; color: #e6e6e6; }
+    h1 { text-align: center; font-weight: 300; margin-bottom: 0.2rem; }
+    p.subtitle { text-align: center; color: #9aa0a6; margin-bottom: 2rem; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+    .card { background: #14161f; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .card img { width: 100%; height: auto; display: block; }
+    .card .info { padding: 1rem; }
+    .card h3 { margin: 0 0 0.4rem; font-weight: 500; }
+    .card p { margin: 0; color: #b0b5bb; font-size: 0.92rem; line-height: 1.4; }
+    footer { text-align: center; margin-top: 3rem; color: #6b7280; font-size: 0.85rem; }
+    a { color: #7dd3fc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>math_vis</h1>
+  <p class="subtitle">Can visual beauty spark mathematical curiosity?</p>
+  <div class="gallery">
+    <div class="card">
+      <img src="flow_field.png" alt="Flow field">
+      <div class="info">
+        <h3>Flow Field</h3>
+        <p>Smooth random angles guide thousands of particle trajectories.</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="truchet.png" alt="Truchet weave">
+      <div class="info">
+        <h3>Truchet Weave</h3>
+        <p>Simple non-crossing tile pairings create woven ribbons.</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="stained_glass_crisp.png" alt="Stained glass crisp">
+      <div class="info">
+        <h3>Stained-Glass Crisp</h3>
+        <p>Voronoi cells, streaks, cracks, and rounded lead lines.</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="glass_rose.png" alt="Glass rose">
+      <div class="info">
+        <h3>Glass Rose</h3>
+        <p>Radial symmetry, cosine color patterns, and gem lighting.</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src=".png" alt="">
+      <div class="info">
+        <h3></h3>
+        <p>Random walks and a Markov chain of triangles and rectangles.</p>
+      </div>
+    </div>
+  </div>
+  <footer>
+    Generated with <a href="https://github.com/imanmossavat/math_vis">math_vis</a> · MIT License
+  </footer>
+</body>
+</html>
