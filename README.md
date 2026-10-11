@@ -1,5 +1,10 @@
 # math_vis
 
+[![tests](https://github.com/imanmossavat/math_vis/actions/workflows/tests.yml/badge.svg)](https://github.com/imanmossavat/math_vis/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-blue?logo=githubpages)](https://imanmossavat.github.io/math_vis/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
+
 > Can visual beauty spark mathematical curiosity?
 
 This project explores mathematical ideas by turning them into things we can
