@@ -46,6 +46,21 @@ The repository contains experiments with topics including:
 
 ---
 
+
+## Gallery
+
+A few outputs from the notebooks and renderers.
+
+| Flow field | Glass rose |
+|:-----------|:-----------|
+| ![Flow field](assets/flow_field_preview.png) | ![Glass rose](assets/glass_rose_preview.png) |
+
+| Stained glass (crisp) | Truchet weave |
+|:----------------------|:--------------|
+| ![Stained glass crisp](assets/stained_glass_crisp_preview.png) | ![Truchet weave](assets/truchet_weave_preview.png) |
+
+---
+
 ## Installation
 
 ```bash
