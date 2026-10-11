@@ -1,208 +1,97 @@
-# Math behind the visuals
+# The Mathematics Behind the Images
 
-This file collects the mathematics used by the `math_vis` package.
+> For implementation details, code recipes, and function-specific notes, see **[TECHNICAL.md](TECHNICAL.md)**.
 
----
+How can a grid of random numbers become a flowing landscape? Why do a few simple geometric rules produce intricate patterns? And how can repetition, randomness, and symmetry create images that feel both structured and surprising?
 
-## 1. Random scalar fields
+The experiments in `math_vis` explore questions like these. Each image begins with a small set of mathematical rules. The visual result is often much more complex than the rules themselves.
 
-Many pieces start with a grid of independent random numbers and blur them so that
-neighbouring values become similar.
+This page explores some of the ideas behind the images. It is not a formal introduction to every topic, but a starting point for anyone curious about the mathematics hiding inside generative art.
 
-```
-noise  ~ N(0, 1)   on an (H, W) grid
-blur   = gaussian_filter(noise, sigma, mode='wrap')
-field  = (blur - mean(blur)) / std(blur)
-```
+## 1. From randomness to structure
 
-* `sigma` controls feature size: small = grainy, large = smooth gradients.
-* `mode='wrap'` makes the field tileable.
-* Normalising to mean 0 and std 1 keeps parameters comparable across sizes.
+Imagine filling a grid with random numbers. At first, every location is independent of its neighbours. The result is a field of visual noise.
 
-### Bilinear sampling (`sample`)
+Now blur the grid with a Gaussian filter. Nearby values begin to influence one another, and broad regions of similar values emerge. Increase the blur and the structures become larger and smoother. Decrease it and finer details return.
 
-`map_coordinates` looks up the field at fractional row/column positions with
-linear interpolation. This lets us read the field at any continuous `(x, y)`
-coordinate, e.g. for integrating a flow field.
+A small change in one parameter can transform the character of an entire image.
 
----
+**The mathematical idea:** Gaussian convolution, spatial correlation, and random fields.
 
-## 2. Palettes and color mapping
+**Try exploring:** What happens when you gradually increase the smoothing scale? At what point does fine-grained noise become a landscape of broad shapes?
 
-### Hex palette (`make_cmap`)
+## 2. When numbers become motion
 
-A list of hex colors is turned into a continuous 1-D lookup table `palette(t)`
-with `t ∈ [0, 1]`.
+A flow field turns a static mathematical field into a map of directions.
 
-### Cosine palette (`cosine_cmap`)
+At each position, a scalar value determines an angle. That angle becomes a direction vector:
 
-For iridescent colors we use Inigo Quilez’s cosine palette:
+\[
+v(x,y) = (\cos\theta(x,y),\ \sin\theta(x,y))
+\]
 
-```
-color(t) = a + b * cos(2π * (c*t + d))
-```
+Place a point in the field and repeatedly move it a small distance in the direction indicated by the field. Its path traces a curve. Repeat this for many starting points and a whole network of flowing lines appears.
 
-with different `(a, b, c, d)` triples for the R, G, B channels.
+The field is mathematical, but the image makes its structure visible. Smooth regions produce coherent motion; changes in direction bend and separate the paths.
 
-### Squashing (`squash`)
+**The mathematical idea:** Vector fields, trigonometry, and numerical integration.
 
-Raw field values are roughly `-3 … +3`. The tanh squash maps them smoothly to
-`[0, 1]` without hard clipping:
+**Try exploring:** Predict what will happen before increasing the strength of the angle variation. Will the paths become more orderly, more tangled, or something else?
 
-```
-squash(f) = 0.5 + 0.5 * tanh(f / softness)
-```
+## 3. Geometry from a collection of points
 
----
+Scatter points across a plane and ask a simple question: which point is closest to each location?
 
-## 3. Voronoi cells and Lloyd relaxation
+The answer divides the plane into Voronoi cells. Every cell contains the locations closest to one particular seed point. A set of points has become a tessellation.
 
-### Seeds → cells
+But the story does not end there. Move each seed toward the centre of its cell, then repeat the process. This is called Lloyd relaxation. The cells tend to become more evenly distributed, creating a different kind of geometry.
 
-Given seed points `s_i`, every pixel belongs to the nearest seed:
+**The mathematical idea:** Distance, geometric partitioning, and iterative algorithms.
 
-```
-cell(p) = argmin_i  |p - s_i|
-```
+**Try exploring:** Compare a Voronoi diagram made from random points with one produced after several rounds of relaxation. What changes, and what stays the same?
 
-This partitions the canvas into Voronoi cells.
+## 4. Patterns built from tiles
 
-### Lloyd relaxation
+A small collection of tiles can generate a surprisingly elaborate image. In a Truchet-style pattern, each tile connects curves across its edges. Rotating or reflecting tiles changes how those curves meet their neighbours.
 
-Each seed is moved to the centroid of its cell. Repeating this makes cells
-regular and evenly spaced.
+Local choices combine into global structure. Paths may weave across the canvas, form loops, or create unexpected large-scale patterns.
 
-```
-s_i <- mean{ p | cell(p) = i }
-```
+The interesting part is that the complexity does not need to be designed one line at a time. It emerges from the rules governing the connections.
 
-In practice we approximate the centroid on a coarse grid for speed.
+**The mathematical idea:** Combinatorics, symmetry, connectivity, and emergent structure.
 
----
+**Try exploring:** What changes when tile orientations are chosen independently at random rather than guided by a smooth spatial field?
 
-## 4. Flow field
+## 5. Symmetry through repetition
 
-1. Build a smooth scalar field `f(x, y)`.
-2. Turn it into an angle field: `θ(x, y) = π * twist * f(x, y)`.
-3. Seed many points on a regular grid with tiny jitter.
-4. Integrate each point forward with Euler steps:
+Many intricate designs can be constructed from a much smaller piece. Create one sector of a pattern, rotate it around a centre, and reflect it where appropriate. The repeated copies produce a complete radial design.
 
-```
-p_{t+1} = p_t + step * (cos θ(p_t), sin θ(p_t))
-```
+Trigonometric functions can also introduce repeating colour patterns. By changing the number of repetitions or the relative contribution of different terms, the same underlying geometry can produce very different visual effects.
 
-5. Color each line by the field value at its start: `t = 0.5 + trend * f(p_0)`.
-6. Vary transparency and width randomly.
+**The mathematical idea:** Rotations, reflections, polar coordinates, and periodic functions.
 
----
+**Try exploring:** Change the number of repeated sectors. How does the symmetry change? Can you predict the visual effect before rendering the image?
 
-## 5. Truchet weave
+## 6. Random walks and island-like structures
 
-### Tile library
+Randomness can also create shapes that remain close to one another.
 
-A tile is a set of connection points on each edge. Pairing the points with
-non-crossing curves gives valid tiles. For 8 points around a square, the number
-of valid pairings is the Catalan number `C_4 = 14`.
+In a random walk, each step introduces a random displacement. Add a preferred direction, or a restoring force that pulls the walk toward an anchor point, and the resulting positions form clusters rather than spreading without limit.
 
-```
-matchings([0..7])  -> 14 pairings
-```
+A second layer of rules can govern which shapes appear next. For example, a Markov chain can make triangles tend to occur in runs, followed by runs of rectangles.
 
-### Orientation and color fields
+Simple stochastic rules begin to suggest a miniature world.
 
-Two independent smooth fields drive the piece:
+**The mathematical idea:** Random walks, stochastic processes, and Markov chains.
 
-* `orient_field` selects the rotation of each tile.
-* `color_field` selects the palette value of each tile.
+**Try exploring:** What happens when the restoring force becomes stronger? How does the balance between randomness and drift change the resulting clusters?
 
-Multiple parallel strands are drawn per curve, shifted slightly along the
-palette to create ribbon-like depth.
+## Beyond the image
 
----
+These examples are starting points, not finished explanations. An attractive result can invite a question, but understanding comes from investigating why the result appears.
 
-## 6. Stained glass (crisp)
+A useful habit is to **notice, predict, experiment, and explain**. Change one parameter, anticipate its effect, compare the outcome with your prediction, and try to connect the difference to the underlying mathematics.
 
-### Cell colors
+The notebooks in this repository are evolving experiments. Over time, I hope to develop more of them into opportunities for mathematical exploration, with clearer explanations, questions, and ideas for further investigation.
 
-Each cell receives a palette value:
-
-```
-t_i = trend   * diagonal_i
-    + (1-trend) * squash(field(s_i))
-    + jitter
-```
-
-where `diagonal_i = (x_i/W + y_i/H) / 2`.
-
-### Streaks
-
-Inside each cell, a sum of sine waves in a random direction creates soft color
-bands. The wave direction is constant per cell but random across cells.
-
-### Hairline cracks
-
-Two systems of thin lines are blended on top:
-
-1. A finer Voronoi network inside the cell.
-2. Contour lines of a smooth scalar field, offset randomly per cell so lines
-   start and stop at the lead.
-
-### Crisp lead with rounded corners
-
-Let `e = (d2 - d1) / 2` be the distance from a pixel to the nearest cell border.
-We shrink every cell by `lead + round` pixels, then dilate it back by `round`
-using a Euclidean distance transform. The result is a lead line of exactly the
-requested width with smoothly rounded convex corners.
-
----
-
-## 7. Glass rose (rose window)
-
-### Symmetric seed layout
-
-Only one half-sector is generated randomly. It is then rotated `n_fold` times
-and mirrored, giving the full rose. Each copy keeps the same original seed id,
-so colors stay perfectly symmetric.
-
-### Color recipe
-
-```
-t = 0.55 * r/R
-  + 0.22 * cos(n_fold * θ)
-  + 0.10 * cos(2 * n_fold * θ)
-  + symmetric_jitter[id]
-```
-
-where `(r, θ)` are polar coordinates around the center. The cosine terms create
-color patterns that repeat in every wedge.
-
-The final image is cropped to a circle by blending the outside toward the lead
-color.
-
----
-
-## 8. Glass lighting model (`glass`)
-
-### Soft lead
-
-The lead alpha is a smoothstep of `e / width` so borders are antialiased.
-A bright rim (`bevel`) is added just inside the lead.
-
-### Facet + glow
-
-Each cell gets a random tilt direction. The pixel-seed displacement projected
-onto this direction gives `f ∈ [-1, 1]`. The light multiplier is:
-
-```
-light = 1 + facet * f + glow * (0.45 - clamp(d1 / R, 0, 1)) + cell_var * noise
-```
-
-### Iridescence
-
-The palette parameter is shifted by `irid * f`, so the hue changes across each
-cell according to its tilt.
-
-### Texture and bloom
-
-* Texture: slow brightness ripples modulate the glass.
-* Bloom: bright areas are blurred and added back, giving a soft glow.
+If you find an unexpected pattern, have a different way to explain one of these ideas, or want to explore another mathematical process, contributions are welcome.

@@ -87,6 +87,13 @@ The `notebooks/` directory contains multi-panel demonstrators:
 
 ---
 
+## Documentation
+
+- **[MATH.md](MATH.md)** — a conceptual, accessible guide to the mathematics behind the images.
+- **[TECHNICAL.md](TECHNICAL.md)** — implementation recipes, function-specific notes, and detailed descriptions of how the code works.
+
+---
+
 ## Tests
 
 ```bash
