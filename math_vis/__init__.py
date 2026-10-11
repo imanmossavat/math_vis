@@ -41,6 +41,8 @@ from .rendering import (
     parse_tile,
     rotate_tile,
     tile_curve,
+    P_TILE,
+    N_TILE,
 )
 
 __all__ = [
@@ -86,4 +88,6 @@ __all__ = [
     "parse_tile",
     "rotate_tile",
     "tile_curve",
+    "P_TILE",
+    "N_TILE",
 ]
