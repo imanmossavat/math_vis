@@ -17,6 +17,11 @@ experiment, and contribute. You are welcome to use the existing notebooks,
 adapt them, or create your own to investigate mathematical ideas that interest
 you.
 
+## Inspiration
+
+The initial idea for this project came from seeing [Kenny Vaden](https://www.linkedin.com/)'s generative-art work.
+If you enjoy these experiments, you should check out their pieces on LinkedIn.
+
 ---
 
 ## What's inside?
@@ -78,8 +83,6 @@ The `notebooks/` directory contains multi-panel demonstrators:
   rounded lead lines.
 - `demo_glass_rose.ipynb` — symmetric seed layout → rose color recipe →
   glass lighting → circular crop.
-- `.ipynb` — cluster anchors → random walk → Markov shapes
-  → rain.
 
 ---
 

@@ -206,28 +206,3 @@ cell according to its tilt.
 
 * Texture: slow brightness ripples modulate the glass.
 * Bloom: bright areas are blurred and added back, giving a soft glow.
-
----
-
-## 9. 
-
-### Accumulated random walk
-
-Each shape is placed near the previous one:
-
-```
-pos_{t+1} = pos_t + N(0, step_sd) + drift - leash * (pos_t - anchor)
-```
-
-`leash` pulls the walk back toward its cluster anchor.
-
-### Markov chain
-
-Each shape is either a triangle or a rectangle. With small probabilities
-`p_to_rect` / `p_to_tri` the chain switches, creating runs of one kind.
-
-### Rain
-
-A fraction `rain_share` of shapes drops a thin vertical line from its lowest
-point down to a random floor level, drawn behind the shapes.
-

@@ -46,19 +46,6 @@ def test_render_glass_rose():
     )
     assert img.ndim == 3 and img.shape[2] == 3
     assert img.dtype == np.uint8
-
-
-def test_():
-    img = mv.(
-        seed=1,
-        W=8,
-        H=10,
-        shapes_each=50,
-    )
-    assert img.ndim == 3 and img.shape[2] == 3
-    assert img.dtype == np.uint8
-
-
 def test_glass_stages():
     rng = np.random.default_rng(1)
     seeds = mv.seeds_relaxed(20, 80, 80, rng, iters=1)
