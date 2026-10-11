@@ -23,8 +23,12 @@ def test_notebook_runs(path):
     t0 = time.time()
     for i, cell in enumerate(nb.cells):
         if cell.cell_type == 'code':
+            # Skip IPython magic lines (e.g. %matplotlib inline) when exec-ing outside a kernel
+            src = '\n'.join(line for line in cell.source.splitlines() if not line.lstrip().startswith('%'))
+            if not src.strip():
+                continue
             try:
-                exec(cell.source, ns)
+                exec(src, ns)
             except Exception as e:
                 raise AssertionError(f"Error in {os.path.basename(path)} cell {i}: {e}") from e
     elapsed = time.time() - t0

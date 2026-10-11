@@ -3,6 +3,7 @@
 [![tests](https://github.com/imanmossavat/math_vis/actions/workflows/tests.yml/badge.svg)](https://github.com/imanmossavat/math_vis/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-blue?logo=githubpages)](https://imanmossavat.github.io/math_vis/)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/imanmossavat/math_vis/main?urlpath=tree/notebooks)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
 
 > Can visual beauty spark mathematical curiosity?
@@ -50,7 +51,7 @@ The repository contains experiments with topics including:
 ```bash
 git clone git@github.com:imanmossavat/math_vis.git
 cd math_vis
-pip install numpy matplotlib scipy pillow ipython nbformat pytest
+pip install -r requirements.txt
 ```
 
 ---
