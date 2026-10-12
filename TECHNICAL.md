@@ -1,5 +1,7 @@
 # Technical Notes
 
+By **Iman Mossavat**, Fontys ICT.
+
 This document contains implementation recipes, function-specific notes, and detailed mathematical descriptions for the `math_vis` package. It is aimed at readers who want to understand *how* the code produces the images.
 
 For a gentler, concept-first introduction to the mathematics, see **[MATH.md](MATH.md)**.
