@@ -28,9 +28,9 @@ A flow field turns a static mathematical field into a map of directions.
 
 At each position, a scalar value determines an angle. That angle becomes a direction vector:
 
-\[
+$$
 v(x,y) = (\cos\theta(x,y),\ \sin\theta(x,y))
-\]
+$$
 
 Place a point in the field and repeatedly move it a small distance in the direction indicated by the field. Its path traces a curve. Repeat this for many starting points and a whole network of flowing lines appears.
 
