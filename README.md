@@ -93,22 +93,21 @@ Each `render_*` function returns a `uint8` RGB NumPy array. Pass it to
 
 ---
 
+## Start here
+
+| Goal | Notebook | What you will learn |
+|------|----------|---------------------|
+| Fields, palettes, lighting, and finishing | `demo_lighting_and_sampling.ipynb` | The primitives used everywhere else. |
+| Turn a smooth field into flowing lines | `demo_flow_field.ipynb` | Angle fields, numerical integration, and color by starting value. |
+| Build patterns from simple tiles | `demo_truchet.ipynb` | Truchet matchings, orientation fields, and multi-strand ribbons. |
+| Voronoi cells with crisp lead | `demo_stained_glass_crisp.ipynb` | Lloyd relaxation, cell colors, streaks, cracks, and rounded lead. |
+| Radial symmetry and soft glass glow | `demo_glass_rose.ipynb` | Rose-window seed layouts and the facet/glow lighting model. |
+| A declarative drawing language | `demo_drawing_language.ipynb` | Layouts, isolated seeds, walks, and reusable layers. |
+
 ## Notebooks
 
-The `notebooks/` directory contains multi-panel demonstrators:
-
-- `demo_lighting_and_sampling.ipynb` — raw noise → smooth fields → palettes →
-  lighting → finishing.
-- `demo_flow_field.ipynb` — smooth field → angles → particle integration →
-  final render.
-- `demo_truchet.ipynb` — tile library → orientation/color fields → woven
-  ribbons.
-- `demo_stained_glass_crisp.ipynb` — Voronoi cells → colors → streaks →
-  rounded lead lines.
-- `demo_drawing_language.ipynb` — a small declarative drawing language built on top of
-  `math_vis`: layouts, expressions, isolated seeds, and reusable layers.
-- `demo_glass_rose.ipynb` — symmetric seed layout → rose color recipe →
-  glass lighting → circular crop.
+The `notebooks/` directory contains the multi-panel demonstrators listed in the
+[Start here](#start-here) table above.
 
 ---
 
@@ -116,6 +115,8 @@ The `notebooks/` directory contains multi-panel demonstrators:
 
 - **[MATH.md](MATH.md)** — a conceptual, accessible guide to the mathematics behind the images.
 - **[TECHNICAL.md](TECHNICAL.md)** — implementation recipes, function-specific notes, and detailed descriptions of how the code works.
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — how the package is organized, the data-flow diagram, and reproducibility notes.
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — setup, tests, conventions, and how to add a new piece.
 
 ---
 
