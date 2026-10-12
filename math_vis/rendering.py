@@ -478,7 +478,7 @@ def render_stained_glass_crisp(
     )
     seeds = seeds_relaxed(n_cells, W, H, rng, iters=lloyd_iters)
     t_cell = cell_colors(seeds, W, H, rng, trend=trend, smooth=smooth, jitter=jitter)
-    img = glass_crisp(
+    out = glass_crisp(
         seeds,
         t_cell,
         palette,
@@ -492,10 +492,12 @@ def render_stained_glass_crisp(
         streak_light=streak_light,
         crack_alpha=crack_alpha,
         contour_alpha=contour_alpha,
+        stages=stages,
     )
     if stages:
-        return img
-    return finish(img, grain=grain, display=False)
+        img, snap = out
+        return img, snap
+    return finish(out, grain=grain, display=False)
 
 
 def render_glass_rose(

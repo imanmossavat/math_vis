@@ -10,7 +10,7 @@ experiments, bug reports, better explanations, or small fixes — are welcome.
 You need Python 3.12 or newer.
 
 ```bash
-git clone git@github.com:imanmossavat/math_vis.git
+git clone https://github.com/imanmossavat/math_vis.git
 cd math_vis
 python3 -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate

@@ -60,7 +60,7 @@ The repository contains experiments with topics including:
 ## Installation
 
 ```bash
-git clone git@github.com:imanmossavat/math_vis.git
+git clone https://github.com/imanmossavat/math_vis.git
 cd math_vis
 pip install -r requirements.txt
 ```
@@ -79,11 +79,11 @@ pip install -e .
 import math_vis as mv
 
 img = mv.render_flow_field(seed=11)
-img = mv.render_glass_rose(seed=9)
+mv.finish(img, display=True)  # show the result; use name=... to save
 ```
 
-Each `render_*` function returns a `uint8` RGB NumPy array. Pass it to
-`mv.finish(...)` to add grain, vignette, save, and display.
+Each `render_*` function already returns a finished `uint8` RGB NumPy array.
+Call `mv.finish(...)` again when you want extra vignette, to save, or to display inline.
 
 ---
 

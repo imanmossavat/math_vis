@@ -46,6 +46,21 @@ def test_render_glass_rose():
     )
     assert img.ndim == 3 and img.shape[2] == 3
     assert img.dtype == np.uint8
+
+def test_render_stained_glass_crisp_stages():
+    img, stages = mv.render_stained_glass_crisp(
+        seed=1,
+        W=120,
+        H=100,
+        n_cells=15,
+        lloyd_iters=1,
+        stages=True,
+    )
+    assert img.ndim == 3 and img.shape[2] == 3
+    assert img.dtype == np.float32
+    assert isinstance(stages, dict)
+    assert "flat" in stages and "final" in stages
+
 def test_glass_stages():
     rng = np.random.default_rng(1)
     seeds = mv.seeds_relaxed(20, 80, 80, rng, iters=1)
