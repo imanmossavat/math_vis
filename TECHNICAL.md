@@ -134,10 +134,10 @@ Each cell receives a palette value:
 ```
 t_i = trend   * diagonal_i
     + (1-trend) * squash(field(s_i))
-    + jitter
+    + N(0, jitter)
 ```
 
-where `diagonal_i = (x_i/W + y_i/H) / 2`.
+where `diagonal_i = (x_i/W + y_i/H) / 2`. The whole expression is clipped to [0, 1].
 
 ### Streaks
 
@@ -176,10 +176,11 @@ t = 0.55 * r/R
   + 0.22 * cos(n_fold * θ)
   + 0.10 * cos(2 * n_fold * θ)
   + symmetric_jitter[id]
+  + 0.1
 ```
 
 where `(r, θ)` are polar coordinates around the center. The cosine terms create
-color patterns that repeat in every wedge.
+color patterns that repeat in every wedge. The `symmetric_jitter[id]` term is Gaussian, `N(0, 0.05)`, sampled once per original seed id and reused for every copy; the constant `+0.1` shifts the whole palette upward. The whole expression is clipped to [0, 1].
 
 The final image is cropped to a circle by blending the outside toward the lead
 color.
@@ -187,6 +188,8 @@ color.
 ---
 
 ## 8. Glass lighting model (`glass`)
+
+`glass_crisp()` uses a different pipeline — streaks, cracks, and rounded lead lines, described in section 6 — rather than the facet/glow model presented here.
 
 ### Soft lead
 
