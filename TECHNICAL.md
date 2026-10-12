@@ -252,11 +252,10 @@ the layer changes the stream and gives a different picture.
 
 ### Walk
 
-`walk(step, per='row')` groups by row (or by any table column) and applies
-`np.cumsum`:
+`walk(step, per='row')` groups by row and applies `np.cumsum`:
 
 ```
-h_j = sum_{i<=j} step_i      (restarted per group)
+h_j = sum_{k<=j} eps_k      (restarted per row)
 ```
 
 The result has memory: a large positive step biases all later positions in the
