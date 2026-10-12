@@ -97,6 +97,8 @@ The `notebooks/` directory contains multi-panel demonstrators:
   ribbons.
 - `demo_stained_glass_crisp.ipynb` — Voronoi cells → colors → streaks →
   rounded lead lines.
+- `demo_drawing_language.ipynb` — a small declarative drawing language built on top of
+  `math_vis`: layouts, expressions, isolated seeds, and reusable layers.
 - `demo_glass_rose.ipynb` — symmetric seed layout → rose color recipe →
   glass lighting → circular crop.
 
