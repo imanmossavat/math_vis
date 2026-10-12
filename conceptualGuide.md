@@ -2,7 +2,7 @@
 
 By **Iman Mossavat**, Fontys ICT.
 
-> For implementation details, code recipes, and function-specific notes, see **[TECHNICAL.md](TECHNICAL.md)**.
+> For implementation details, code recipes, and function-specific notes, see **[recipes.md](recipes.md)**.
 
 How can a grid of random numbers become a flowing landscape? Why do a few simple geometric rules produce intricate patterns? And how can repetition, randomness, and symmetry create images that feel both structured and surprising?
 

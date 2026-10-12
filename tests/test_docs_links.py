@@ -21,7 +21,7 @@ def _git_tracked(rel_path):
 
 
 def _iter_image_refs():
-    for doc in ['README.md', 'MATH.md', 'TECHNICAL.md']:
+    for doc in ['README.md', 'conceptualGuide.md', 'recipes.md']:
         text = (REPO_ROOT / doc).read_text()
         for m in IMAGE_RE.finditer(text):
             yield doc, m.group(1), m.group(2)

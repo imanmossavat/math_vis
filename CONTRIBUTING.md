@@ -30,7 +30,7 @@ python -m pytest -q
 * **Reproducibility tests** check that each `render_*` function returns
   byte-identical output for the same seed.
 * **`test_docs_links.py`** checks that every image referenced from
-  `README.md`, `MATH.md`, `TECHNICAL.md`, and the notebooks points to a file
+  `README.md`, `conceptualGuide.md`, `recipes.md`, and the notebooks points to a file
   tracked by git.
 * **`test_notebooks.py`** executes every `notebooks/demo_*.ipynb` end-to-end as
   a smoke test and makes sure the run did not leave untracked PNGs in the
@@ -65,7 +65,7 @@ A typical path from idea to merge:
    `tests/test_reproducibility.py` if you add another renderer.
 5. **Document it.** Add a gallery preview to `assets/`, a generator script if
    applicable, an entry in `assets/README.md`, a row in the README "Start here"
-   table, and any notes needed by `MATH.md` or `TECHNICAL.md`.
+   table, and any notes needed by `conceptualGuide.md` or `recipes.md`.
 
 ## Reporting issues
 
