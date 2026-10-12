@@ -4,8 +4,6 @@ By **Iman Mossavat**, Fontys ICT.
 
 [![tests](https://github.com/imanmossavat/math_vis/actions/workflows/tests.yml/badge.svg)](https://github.com/imanmossavat/math_vis/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-blue?logo=githubpages)](https://imanmossavat.github.io/math_vis/)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/imanmossavat/math_vis/main?urlpath=tree/notebooks)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
 
 > Can visual beauty spark mathematical curiosity?
@@ -20,10 +18,19 @@ experiment, and contribute. You are welcome to use the existing notebooks,
 adapt them, or create your own to investigate mathematical ideas that interest
 you.
 
-## Inspiration
+---
 
-The initial idea for this project came from seeing Kenny Vaden's art work on LinkedIn.
-If you enjoy these experiments, you should check them out on [LinkedIn](https://www.linkedin.com/search/results/people/?keywords=Kenny%20Vaden).
+## Gallery
+
+A few outputs from the notebooks and renderers.
+
+| Flow field | Glass rose |
+|:-----------|:-----------|
+| ![Flow field](assets/flow_field_preview.png) | ![Glass rose](assets/glass_rose_preview.png) |
+
+| Stained glass (crisp) | Truchet weave |
+|:----------------------|:--------------|
+| ![Stained glass crisp](assets/stained_glass_crisp_preview.png) | ![Truchet weave](assets/truchet_weave_preview.png) |
 
 ---
 
@@ -50,31 +57,18 @@ The repository contains experiments with topics including:
 
 ---
 
-
-## Gallery
-
-A few outputs from the notebooks and renderers.
-
-| Flow field | Glass rose |
-|:-----------|:-----------|
-| ![Flow field](assets/flow_field_preview.png) | ![Glass rose](assets/glass_rose_preview.png) |
-
-| Stained glass (crisp) | Truchet weave |
-|:----------------------|:--------------|
-| ![Stained glass crisp](assets/stained_glass_crisp_preview.png) | ![Truchet weave](assets/truchet_weave_preview.png) |
-
-| Drawing language: warped grid | Drawing language: random walk |
-|:------------------------------|:------------------------------|
-| ![Drawing language grid](assets/drawing_language_grid_preview.png) | ![Drawing language walk](assets/drawing_language_walk_preview.png) |
-
----
-
 ## Installation
 
 ```bash
 git clone git@github.com:imanmossavat/math_vis.git
 cd math_vis
 pip install -r requirements.txt
+```
+
+The package itself is also pip-installable. From the repo root run:
+
+```bash
+pip install -e .
 ```
 
 ---
@@ -104,6 +98,8 @@ Each `render_*` function returns a `uint8` RGB NumPy array. Pass it to
 | Radial symmetry and soft glass glow | `demo_glass_rose.ipynb` | Rose-window seed layouts and the facet/glow lighting model. |
 | A declarative drawing language | `demo_drawing_language.ipynb` | Layouts, isolated seeds, walks, and reusable layers. |
 
+---
+
 ## Notebooks
 
 The `notebooks/` directory contains the multi-panel demonstrators listed in the
@@ -113,8 +109,8 @@ The `notebooks/` directory contains the multi-panel demonstrators listed in the
 
 ## Documentation
 
-- **[MATH.md](MATH.md)** — a conceptual, accessible guide to the mathematics behind the images.
-- **[TECHNICAL.md](TECHNICAL.md)** — implementation recipes, function-specific notes, and detailed descriptions of how the code works.
+- **[conceptualGuide.md](conceptualGuide.md)** — a conceptual, accessible guide to the mathematics behind the images.
+- **[recipes.md](recipes.md)** — implementation recipes, function-specific notes, and detailed descriptions of how the code works.
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** — how the package is organized, the data-flow diagram, and reproducibility notes.
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** — setup, tests, conventions, and how to add a new piece.
 
@@ -138,3 +134,9 @@ This project is released under the MIT License — see [LICENSE](LICENSE).
 
 Ideas, bug reports, and new visual experiments are all welcome. Open an issue
 or a pull request on GitHub.
+
+---
+
+## Inspiration
+
+The initial idea for this project came from seeing Kenny Vaden's art work on LinkedIn.
