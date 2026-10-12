@@ -211,3 +211,99 @@ cell according to its tilt.
 
 * Texture: slow brightness ripples modulate the glass.
 * Bloom: bright areas are blurred and added back, giving a soft glow.
+
+## 9. Drawing language
+
+The `demo_drawing_language.ipynb` notebook implements a tiny declarative graphics
+language on top of `math_vis`. A picture is a list of `Layer`s; each layer is
+built in five stages.
+
+### Layer pipeline
+
+1. **Layout** — `make_table` turns a `Rows` or `Grid` declaration into an
+   element table with `x`, `y`, `row`, `col`, `u`, `v` columns.
+   * `Rows` fills each row by repeatedly advancing `x` by `advance`.
+   * `Grid` places corners on a regular mesh, applies warps, then builds quads.
+2. **Columns** — `evaluate` runs column expressions in order through a `Ctx`,
+   adding one value per element.
+3. **Shape** — `geometry` produces an anchor and per-element relative vertices.
+   Supported shapes: `circle`, `halfdisc`, `quad`.
+4. **Style** — `layer_items` decides fill/alpha/stroke and builds shade copies.
+5. **Color** — palette lookup `t -> palette(t)`, optional accents.
+
+`render` draws the layers in order at `dpi*ss`, downsamples by `ss`, then
+applies `finish` for grain and vignette.
+
+### Isolated seeds (`stream`)
+
+Every random draw uses its own deterministic stream:
+
+```
+def stream(master, *key):
+    words = [master] + [zlib.crc32(str(k).encode()) for k in key]
+    return np.random.default_rng(np.random.SeedSequence(words))
+```
+
+Inside a layer, `Ctx.begin(column)` resets the operator counter `_k`, and
+`Ctx.rng()` increments it. A column's draws therefore depend only on
+`(master, layer_name, column_name, k)`. Adding a new column or wrapping an
+expression with a deterministic rescale does not change existing draws; renaming
+the layer changes the stream and gives a different picture.
+
+### Walk
+
+`walk(step, per='row')` groups by row (or by any table column) and applies
+`np.cumsum`:
+
+```
+h_j = sum_{i<=j} step_i      (restarted per group)
+```
+
+The result has memory: a large positive step biases all later positions in the
+same row. In the notebook a walk with `N(0, 0.007)` and an independent draw with
+`N(0, 0.06)` are tuned to have a comparable vertical spread, but the walk reads
+as continuous water while the independent draw reads as noise.
+
+### Shade
+
+A layer can draw `N` shrunken copies on top of the fill, each with alpha `a`
+and spread `s`. Stacking `N` copies of the same dark tint gives effective
+darkness
+
+```
+1 - (1 - a)^N
+```
+
+For small `a` this is approximately `N a`. The copies are scaled toward the
+element center so the edge stays sharp while the interior darkens.
+
+### Grid warp
+
+`grid_vertices` displaces each corner `(x, y)` by
+
+```
+amp * f(x, y) * (cos θ, sin θ)
+```
+
+where `θ` is either constant or `π * g(x, y)` when a field name is supplied.
+Because `f` is smooth, neighbouring corners move together and cell edges remain
+joined. Folding appears when the displacement difference across a cell exceeds
+the cell size, roughly
+
+```
+amp * |∇f| > 1
+```
+
+so a field with large gradients or a large amplitude tears the grid.
+
+### What is not implemented
+
+The notebook is a proof of concept, not a complete system. It does not yet
+include:
+
+* triangle, arc, or line shapes (only `circle`, `halfdisc`, `quad`);
+* `scatter` or `along_path` layouts;
+* blend modes between layers;
+* YAML round-trip for layer definitions;
+* a palette linter or accessibility checker.
+

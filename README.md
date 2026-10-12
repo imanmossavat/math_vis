@@ -45,6 +45,8 @@ The repository contains experiments with topics including:
   and radial designs.
 - **Generative landscapes and stained glass** — combining mathematical processes
   into more elaborate visual compositions.
+- **A small drawing language** — declarative layers, isolated random seeds,
+  random walks, and shade, showing how one field can play several roles.
 
 ---
 
@@ -60,6 +62,10 @@ A few outputs from the notebooks and renderers.
 | Stained glass (crisp) | Truchet weave |
 |:----------------------|:--------------|
 | ![Stained glass crisp](assets/stained_glass_crisp_preview.png) | ![Truchet weave](assets/truchet_weave_preview.png) |
+
+| Drawing language: warped grid | Drawing language: random walk |
+|:------------------------------|:------------------------------|
+| ![Drawing language grid](assets/drawing_language_grid_preview.png) | ![Drawing language walk](assets/drawing_language_walk_preview.png) |
 
 ---
 

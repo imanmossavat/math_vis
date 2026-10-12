@@ -88,6 +88,36 @@ Simple stochastic rules begin to suggest a miniature world.
 
 **Try exploring:** What happens when the restoring force becomes stronger? How does the balance between randomness and drift change the resulting clusters?
 
+## 7. A small drawing language
+
+So far each image has been produced by its own script. A drawing language asks a
+different question: can we describe a picture as a small set of reusable rules?
+
+The answer starts with two observations.
+
+First, **memory changes the character of randomness**. If every element gets an
+independent random displacement, the result looks like static. If each
+displacement is the cumulative sum of small random steps — a random walk — then
+nearby elements stay close together and smooth, wave-like bands appear. The same
+average amount of randomness produces two different textures, depending on whether
+the random values remember what came before.
+
+Second, **one field can wear many hats**. A single smooth scalar field can displace
+grid corners, select colors, and control transparency. Because the field is shared,
+shape and color move together, creating a coherence that separate fields would not
+give. Changing which role the field plays changes the picture, even when the
+geometry stays the same.
+
+These two ideas — random walks for memory, and shared fields for coherence — are
+enough to build surprisingly varied pictures from a tiny grammar: layout,
+columns, shape, style, color.
+
+**The mathematical idea:** Cumulative sums, random walks, and multiscale fields.
+
+**Try exploring:** Where else do you see memory in randomness? What happens if a
+field that drives position also drives color, or if two independent fields drive
+them instead?
+
 ## Beyond the image
 
 These examples are starting points, not finished explanations. An attractive result can invite a question, but understanding comes from investigating why the result appears.
