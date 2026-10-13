@@ -1,7 +1,7 @@
 """High-level renderers and the glass rendering pipeline."""
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.collections import LineCollection, PolyCollection
+from matplotlib.collections import LineCollection
 from scipy.spatial import cKDTree
 
 from .utils import make_cmap, upfield, fig_to_img, squash, new_rng
@@ -9,14 +9,10 @@ from .math_tools import (
     smooth_field,
     sample,
     seeds_relaxed,
-    seeds_spiral,
     seeds_rose,
-    matchings,
-    arc_points,
     cubic_bezier,
 )
 from .lighting import (
-    apply_glass_lighting,
     apply_lead_lines,
     apply_texture,
     apply_bloom,
