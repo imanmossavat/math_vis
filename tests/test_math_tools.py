@@ -55,3 +55,30 @@ def test_rotate_2d():
 def test_arc_points_shape():
     a = mv.arc_points(0, 0, 1, 0, 90, n=30)
     assert a.shape == (30, 2)
+
+
+def test_tile_curve_matches_inline_formula():
+    def old_tile_curve(i, j, n=40):
+        p, q = mv.P_TILE[i], mv.P_TILE[j]
+        s = min(0.55 * np.linalg.norm(p - q), 0.2)
+        c1, c2 = p + s * mv.N_TILE[i], q + s * mv.N_TILE[j]
+        t = np.linspace(0, 1, n)[:, None]
+        return (
+            (1 - t) ** 3 * p
+            + 3 * (1 - t) ** 2 * t * c1
+            + 3 * (1 - t) * t**2 * c2
+            + t**3 * q
+        )
+
+    for text in mv.TILE_TEXT:
+        for pair in text.split():
+            i, j = (int(x) for x in pair.split("-"))
+            np.testing.assert_allclose(mv.tile_curve(i, j), old_tile_curve(i, j))
+
+
+def test_cubic_bezier_scales_with_coordinates():
+    p = np.array([0.0, 0.0])
+    q = np.array([1.0, 0.0])
+    curve = mv.cubic_bezier(p, q, n=20, max_offset=None)
+    curve_scaled = mv.cubic_bezier(1000 * p, 1000 * q, n=20, max_offset=None)
+    np.testing.assert_allclose(curve_scaled, 1000 * curve)

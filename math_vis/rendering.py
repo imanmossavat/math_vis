@@ -301,15 +301,9 @@ def rotate_tile(tile, r):
 
 def tile_curve(i, j, n=40):
     """Smooth cubic Bezier curve connecting two edge points of a tile."""
-    p, q = P_TILE[i], P_TILE[j]
-    s = min(0.55 * np.linalg.norm(p - q), 0.2)
-    c1, c2 = p + s * N_TILE[i], q + s * N_TILE[j]
-    t = np.linspace(0, 1, n)[:, None]
-    return (
-        (1 - t) ** 3 * p
-        + 3 * (1 - t) ** 2 * t * c1
-        + 3 * (1 - t) * t**2 * c2
-        + t**3 * q
+    return cubic_bezier(
+        P_TILE[i], P_TILE[j], n=n,
+        normal_p=N_TILE[i], normal_q=N_TILE[j],
     )
 
 

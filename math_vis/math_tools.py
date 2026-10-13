@@ -150,15 +150,24 @@ def rotate_2d(pts, angle, centre=None):
     return rotated
 
 
-def cubic_bezier(p, q, n=40, strength=0.55, normal_p=None, normal_q=None):
-    """Cubic Bezier from ``p`` to ``q`` leaving along inward normals."""
+def cubic_bezier(p, q, n=40, strength=0.55, normal_p=None, normal_q=None,
+                 max_offset=0.2):
+    """Cubic Bezier from ``p`` to ``q`` leaving along inward normals.
+
+    max_offset : float, optional
+        Upper limit on the control-point distance, in the same units as
+        ``p`` and ``q``. ``None`` disables the cap. The default ``0.2`` is
+        appropriate for unit-square tile coordinates.
+    """
     p = np.asarray(p, dtype=float)
     q = np.asarray(q, dtype=float)
     if normal_p is None:
         normal_p = (q - p) / (np.linalg.norm(q - p) + 1e-12)
     if normal_q is None:
         normal_q = (p - q) / (np.linalg.norm(p - q) + 1e-12)
-    s = min(strength * np.linalg.norm(p - q), 0.2)
+    s = strength * np.linalg.norm(p - q)
+    if max_offset is not None:
+        s = min(s, max_offset)
     c1 = p + s * normal_p
     c2 = q + s * normal_q
     t = np.linspace(0, 1, n)[:, None]
