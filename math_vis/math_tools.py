@@ -47,12 +47,11 @@ def sample(field, row, col):
     return out.item() if scalar else out
 
 
-def lloyd_relaxation(seeds, W, H, rng=None, iters=3):
+def lloyd_relaxation(seeds, W, H, iters=3):
     """Move seeds toward the centroid of their Voronoi cells.
 
     Operates on a coarse grid for speed.
     """
-    rng = rng or np.random.default_rng()
     seeds = np.asarray(seeds, dtype=float).copy()
     n = len(seeds)
     step = max(4, W // 250)
@@ -74,7 +73,7 @@ def seeds_relaxed(n, W, H, rng=None, iters=3):
     """Random seeds followed by Lloyd relaxation."""
     rng = rng or np.random.default_rng()
     s = rng.uniform([0, 0], [W, H], size=(n, 2))
-    return lloyd_relaxation(s, W, H, rng=rng, iters=iters)
+    return lloyd_relaxation(s, W, H, iters=iters)
 
 
 def seeds_spiral(n, W, H, rng=None, jitter=0.12):

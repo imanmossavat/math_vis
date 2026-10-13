@@ -22,7 +22,7 @@ def test_lloyd_reduces_variance():
     # seeds perturbed around a regular grid should drift toward grid centers
     grid = np.array([[i, j] for i in np.linspace(10, 90, 5) for j in np.linspace(10, 90, 5)])
     raw = grid + rng.normal(0, 5, grid.shape)
-    relaxed = mv.lloyd_relaxation(raw.copy(), 100, 100, rng=rng, iters=6)
+    relaxed = mv.lloyd_relaxation(raw.copy(), 100, 100, iters=6)
     # after relaxation the points should be closer to the original grid centers
     assert np.linalg.norm(relaxed - grid, axis=1).mean() < np.linalg.norm(raw - grid, axis=1).mean()
 
