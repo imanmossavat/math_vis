@@ -30,7 +30,6 @@ from .lighting import (
 )
 from .finishing import finish
 from .io import load_meta, save_with_meta
-from .io import load_meta, save_with_meta
 from .rendering import (
     cell_colors,
     glass,
@@ -78,9 +77,6 @@ __all__ = [
     "bevel_rim",
     # finishing
     "finish",
-    # io
-    "load_meta",
-    "save_with_meta",
     # io
     "load_meta",
     "save_with_meta",
