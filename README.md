@@ -32,6 +32,10 @@ A few outputs from the notebooks and renderers.
 |:----------------------|:--------------|
 | ![Stained glass crisp](assets/stained_glass_crisp_preview.png) | ![Truchet weave](assets/truchet_weave_preview.png) |
 
+| Bezier tiles |
+|:-------------|
+| ![Bezier tiles](assets/bezier_tiles_preview.png) |
+
 ---
 
 ## What's inside?
