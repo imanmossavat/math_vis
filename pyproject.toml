@@ -16,5 +16,8 @@ dependencies = [
     "pillow",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest", "ipython", "nbformat"]
+
 [tool.setuptools]
 packages = ["math_vis"]

@@ -3,6 +3,3 @@ numpy
 matplotlib
 scipy
 pillow
-ipython
-nbformat
-pytest

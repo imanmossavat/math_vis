@@ -119,6 +119,7 @@ The `notebooks/` directory contains the multi-panel demonstrators listed in the
 ## Tests
 
 ```bash
+pip install -e ".[dev]"
 python3 -m pytest -q
 ```
 

@@ -14,12 +14,12 @@ git clone https://github.com/imanmossavat/math_vis.git
 cd math_vis
 python3 -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -e ".[dev]"
 python -m pytest -q
 ```
 
-`requirements.txt` installs the package in editable mode (`-e .`), so changes to
-`math_vis/` are immediately importable.
+`pip install -e ".[dev]"` installs the package in editable mode (`-e .`) plus
+the test and notebook development dependencies.
 
 ## How the tests work
 
