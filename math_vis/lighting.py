@@ -8,13 +8,14 @@ from .math_tools import smooth_field as _smooth_field
 from .utils import upfield
 
 
-def cell_facet_offset(P, seeds, cell, R):
+def cell_facet_offset(P, seeds, cell, R, rng=None):
     """Project pixel-seed displacement onto a random per-cell tilt direction.
 
     Returns ``f`` in about [-1, 1] for use with ``facet`` lighting.
     """
+    rng = rng or np.random.default_rng()
     n_cells = len(seeds)
-    ang = np.random.default_rng().uniform(0, 2 * np.pi, n_cells)
+    ang = rng.uniform(0, 2 * np.pi, n_cells)
     U = np.column_stack([np.cos(ang), np.sin(ang)])[cell]
     f = np.einsum("ij,ij->i", P - seeds[cell], U) / np.maximum(R, 1.0)
     return f
@@ -60,14 +61,15 @@ def apply_glass_lighting(
     facet=0.35,
     glow=0.35,
     cell_var=0.08,
+    rng=None,
 ):
     """Apply gem-like lighting to a flat color image (flattened pixels)."""
+    rng = rng or np.random.default_rng()
     n_cells = len(seeds)
     cnt = np.maximum(np.bincount(cell, minlength=n_cells), 1)
     Rc = 2 * np.bincount(cell, weights=d1, minlength=n_cells) / cnt
     R = np.maximum(Rc[cell], 1.0)
-    f = cell_facet_offset(P, seeds, cell, R)
-    rng = np.random.default_rng()
+    f = cell_facet_offset(P, seeds, cell, R, rng=rng)
     light = (
         1
         + facet * f

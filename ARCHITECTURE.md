@@ -76,6 +76,6 @@ What is not implemented:
 ## Reproducibility
 
 Passing the same seed to a `render_*` function produces byte-identical output
-(verified in `tests/test_reproducibility.py`). Two helpers still draw from an
-unseeded global generator, so they cannot be made deterministic yet:
-`apply_glass_lighting` and `cell_facet_offset`.
+(verified in `tests/test_reproducibility.py`). All helpers, including
+`apply_glass_lighting` and `cell_facet_offset`, accept an explicit `rng`
+argument and are reproducible when one is supplied.

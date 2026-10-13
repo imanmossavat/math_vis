@@ -73,24 +73,26 @@ def test_squash_properties():
     assert squash(0.0, softness=1.5) == pytest.approx(0.5)
 
 
-@pytest.mark.xfail(strict=True, reason="unseedable randomness")
 def test_cell_facet_offset_should_be_reproducible():
     # Non-zero displacement so that the randomly-chosen tilt direction matters.
     P = np.full((20, 2), 0.5, dtype=np.float32)
     seeds = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
     cell = np.zeros(20, dtype=int)
-    f1 = cell_facet_offset(P, seeds, cell, R=1.0)
-    f2 = cell_facet_offset(P, seeds, cell, R=1.0)
+    rng = np.random.default_rng(0)
+    f1 = cell_facet_offset(P, seeds, cell, R=1.0, rng=rng)
+    rng = np.random.default_rng(0)
+    f2 = cell_facet_offset(P, seeds, cell, R=1.0, rng=rng)
     assert np.allclose(f1, f2)
 
 
-@pytest.mark.xfail(strict=True, reason="unseedable randomness")
 def test_apply_glass_lighting_should_be_reproducible():
     rgb = np.full((20, 3), 128, dtype=np.float32)
     P = np.full((20, 2), 0.5, dtype=np.float32)
     seeds = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
     d1 = np.ones(20, dtype=np.float32)
     cell = np.zeros(20, dtype=int)
-    out1 = apply_glass_lighting(rgb, P, seeds, d1, cell)
-    out2 = apply_glass_lighting(rgb, P, seeds, d1, cell)
+    rng = np.random.default_rng(0)
+    out1 = apply_glass_lighting(rgb, P, seeds, d1, cell, rng=rng)
+    rng = np.random.default_rng(0)
+    out2 = apply_glass_lighting(rgb, P, seeds, d1, cell, rng=rng)
     assert np.allclose(out1, out2)
