@@ -25,6 +25,7 @@ graph LR
 | `math_tools` | Scalar fields, sampling, geometry primitives | `smooth_field`, `sample`, `seeds_relaxed`, `seeds_spiral`, `seeds_rose`, `lloyd_relaxation`, `arc_points`, `rotate_2d`, `cubic_bezier`, `matchings` |
 | `lighting` | Glass lighting, lead lines, texture, cracks | `apply_glass_lighting`, `apply_lead_lines`, `apply_texture`, `apply_bloom`, `apply_streaks`, `apply_cracks`, `apply_rounded_lead`, `lead_mask`, `bevel_rim` |
 | `rendering` | Color recipes, glass pipelines, high-level renderers | `cell_colors`, `glass`, `glass_crisp`, `render_flow_field`, `render_truchet_weave`, `render_stained_glass_crisp`, `render_glass_rose`, `parse_tile`, `rotate_tile`, `tile_curve` |
+| `basins` | Newton basins of attraction, settling times, and tangledness metrics | `basin_map`, `render_basins`, `uncertainty_exponent`, `fast_lyapunov_indicator`, `basin_entropy` |
 | `finishing` | Grain, vignette, save, display | `finish` |
 
 A separate `io` module holds `save_with_meta` and `load_meta` for embedding JSON
