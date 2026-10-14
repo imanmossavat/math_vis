@@ -4,7 +4,6 @@ This module is intentionally one-directional: it may import from the rest of
 ``math_vis``, but no other module depends on it.
 """
 import numpy as np
-from matplotlib.colors import to_rgb
 from matplotlib import colormaps as _mpl_colormaps
 
 from .utils import make_cmap
