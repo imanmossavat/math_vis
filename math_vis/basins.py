@@ -22,18 +22,19 @@ __all__ = [
 ]
 
 
-# A small, distinct palette.  Red is deliberately first because the user likes
-# red-forward Newton fractals.
-DEFAULT_PALETTE = [
-    "#e41a1c",  # red
-    "#377eb8",  # blue
-    "#4daf4a",  # green
-    "#984ea3",  # purple
-    "#ff7f00",  # orange
-    "#ffff33",  # yellow
-    "#a65628",  # brown
-    "#f781bf",  # pink
+# The same blue-to-red-purple gradient used by the other notebooks.
+STAINED_GLASS_PALETTE = [
+    "#0b1d3a",
+    "#1f4e8c",
+    "#2aa5c9",
+    "#58d3c0",
+    "#f4e285",
+    "#f59e3b",
+    "#e0453a",
+    "#8e2a6a",
+    "#3a1d6e",
 ]
+DEFAULT_PALETTE = STAINED_GLASS_PALETTE
 
 
 def roots_unity(n):
@@ -414,8 +415,9 @@ def render_fli(fli, cmap="magma", lo=1, hi=99):
     ----------
     fli : np.ndarray
         Fast Lyapunov indicator array.
-    cmap : str
-        Matplotlib colormap name.
+    cmap : str, matplotlib.colors.Colormap, or list of str
+        Matplotlib colormap name, a colormap object, or a list of hex colors
+        that will be turned into a linear colormap.
     lo, hi : float
         Percentiles used for contrast stretching.
 
@@ -425,7 +427,11 @@ def render_fli(fli, cmap="magma", lo=1, hi=99):
         ``uint8`` RGB image.
     """
     fli = np.asarray(fli)
-    cmap = _mpl_colormaps.get_cmap(cmap)
+    if isinstance(cmap, list):
+        cmap = make_cmap(cmap)
+    elif isinstance(cmap, str):
+        cmap = _mpl_colormaps.get_cmap(cmap)
+    # Otherwise assume a matplotlib Colormap was passed.
     vmin = np.percentile(fli, lo)
     vmax = np.percentile(fli, hi)
     t = np.clip((fli - vmin) / (vmax - vmin + 1e-12), 0.0, 1.0)
