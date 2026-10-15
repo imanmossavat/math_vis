@@ -58,7 +58,7 @@ The repository contains experiments with topics including:
   into more elaborate visual compositions.
 - **A small drawing language** — declarative layers, isolated random seeds,
   random walks, and shade, showing how one field can play several roles.
-- **Basins of attraction and Newton fractals** — fixed points, basins, settling times, metrics, and a precision lesson.
+- **Basins of attraction and Newton fractals** — fixed points, basins, settling times, uncertainty exponent / entropy metrics, and a float32 precision lesson. Uses the same stained-glass palette as the glass renderers; the two-root control case is red-on-black.
 
 ---
 
@@ -110,6 +110,13 @@ Call `mv.finish(...)` again when you want extra vignette, to save, or to display
 
 The `notebooks/` directory contains the multi-panel demonstrators listed in the
 [Start here](#start-here) table above.
+
+### Preview images
+
+When developing new visuals I generate temporary, high-resolution candidate
+renders in `notebooks/.preview/`. That folder is git-ignored and local-only, so
+it never appears on GitHub. Open the files directly in VS Code or your image
+viewer while reviewing.
 
 ---
 
