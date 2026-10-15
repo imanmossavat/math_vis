@@ -58,6 +58,7 @@ The repository contains experiments with topics including:
   into more elaborate visual compositions.
 - **A small drawing language** — declarative layers, isolated random seeds,
   random walks, and shade, showing how one field can play several roles.
+- **Basins of attraction and Newton fractals** — fixed points, basins, settling times, metrics, and a precision lesson.
 
 ---
 
@@ -101,6 +102,7 @@ Call `mv.finish(...)` again when you want extra vignette, to save, or to display
 | Voronoi cells with crisp lead | `demo_stained_glass_crisp.ipynb` | Lloyd relaxation, cell colors, streaks, cracks, and rounded lead. |
 | Radial symmetry and soft glass glow | `demo_glass_rose.ipynb` | Rose-window seed layouts and the facet/glow lighting model. |
 | A declarative drawing language | `demo_drawing_language.ipynb` | Layouts, isolated seeds, walks, and reusable layers. |
+| Basins of attraction and Newton fractals | `demo_basins.ipynb` | Fixed points, basins, settling times, metrics, and precision. |
 
 ---
 
