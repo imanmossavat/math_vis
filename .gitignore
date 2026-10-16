@@ -9,3 +9,4 @@ __pycache__/
 archive/
 notebooks/.preview/
 .DS_Store
+docs/ai-context.md
