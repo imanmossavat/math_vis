@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from math_vis.reaction_diffusion import (
+from pattern_formation.reaction_diffusion import (
     laplacian,
     initial_state,
     gray_scott,

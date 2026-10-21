@@ -31,7 +31,6 @@ from .lighting import (
 from .finishing import finish
 from .io import load_meta, save_with_meta
 from . import basins
-from . import reaction_diffusion
 from .rendering import (
     cell_colors,
     glass,

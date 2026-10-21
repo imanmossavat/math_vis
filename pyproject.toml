@@ -20,4 +20,4 @@ dependencies = [
 dev = ["pytest", "ipython", "nbformat"]
 
 [tool.setuptools]
-packages = ["math_vis"]
+packages = ["math_vis", "pattern_formation"]

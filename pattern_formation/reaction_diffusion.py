@@ -16,9 +16,9 @@ package depends on it.
 import numpy as np
 from matplotlib.colors import LightSource
 
-from .math_tools import smooth_field
-from .utils import make_cmap, new_rng
-from .finishing import finish
+from math_vis.math_tools import smooth_field
+from math_vis.utils import make_cmap, new_rng
+from math_vis.finishing import finish
 
 
 __all__ = [
