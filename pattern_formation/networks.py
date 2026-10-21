@@ -89,14 +89,14 @@ def relax(n, source, sinks, nu=1.0, gamma=0.5, dt=0.1, steps=2000, C0=None):
 
 
 def relax_fluctuating(n, source, sink_pool, k=5, draws=3, nu=1.0, gamma=0.5,
-                      dt=0.1, steps=2000, rng=None):
+                      dt=0.1, steps=2000, rng=None, C0=None):
     """Like :func:`relax`, but the load moves: each step averages Q^2 over ``draws``
     random choices of ``k`` active sinks from ``sink_pool`` (each drains 1 unit).
     """
     rng = rng or np.random.default_rng()
     N = n * n
     edges = grid_edges(n)
-    C = np.ones(len(edges))
+    C = np.ones(len(edges)) if C0 is None else C0.copy()
     for _ in range(steps):
         Q2 = np.zeros(len(edges))
         for _ in range(draws):

@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "ipython", "nbformat"]
+dev = ["pytest", "ipython", "nbformat", "ipywidgets"]
 
 [tool.setuptools]
 packages = ["math_vis", "pattern_formation"]

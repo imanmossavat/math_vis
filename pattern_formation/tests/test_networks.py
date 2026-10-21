@@ -60,3 +60,18 @@ def test_moving_load_keeps_loops_even_for_concave_cost():
     edges, C = relax_fluctuating(N_SIDE, CENTRE, SINKS, gamma=0.5, steps=4000,
                                  rng=np.random.default_rng(0))
     assert count_loops(edges, C, N, 1e-3 * C.max()) > 30  # steady load gave 0
+
+
+def test_relax_can_be_continued_from_C0():
+    # two half-runs equal one full run (needed to take snapshots along the way)
+    n, c = 5, 12
+    sinks = [i for i in range(25) if i != c]
+    _, whole = relax(n, c, sinks, steps=200)
+    _, half = relax(n, c, sinks, steps=100)
+    _, again = relax(n, c, sinks, steps=100, C0=half)
+    assert np.allclose(whole, again)
+    rng = np.random.default_rng(1)
+    _, whole = relax_fluctuating(n, c, sinks, steps=20, rng=np.random.default_rng(1))
+    _, half = relax_fluctuating(n, c, sinks, steps=10, rng=rng)
+    _, again = relax_fluctuating(n, c, sinks, steps=10, rng=rng, C0=half)
+    assert np.allclose(whole, again)
