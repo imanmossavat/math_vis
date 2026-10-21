@@ -24,6 +24,7 @@ __all__ = [
     "adapt",
     "count_loops",
     "relax",
+    "relax_fluctuating",
     "draw_network",
 ]
 
@@ -84,6 +85,26 @@ def relax(n, source, sinks, nu=1.0, gamma=0.5, dt=0.1, steps=2000, C0=None):
     for _ in range(steps):
         p = solve_pressure(edges, C, s)
         C = adapt(C, link_flows(edges, C, p) ** 2, nu, gamma, dt)
+    return edges, C
+
+
+def relax_fluctuating(n, source, sink_pool, k=5, draws=3, nu=1.0, gamma=0.5,
+                      dt=0.1, steps=2000, rng=None):
+    """Like :func:`relax`, but the load moves: each step averages Q^2 over ``draws``
+    random choices of ``k`` active sinks from ``sink_pool`` (each drains 1 unit).
+    """
+    rng = rng or np.random.default_rng()
+    N = n * n
+    edges = grid_edges(n)
+    C = np.ones(len(edges))
+    for _ in range(steps):
+        Q2 = np.zeros(len(edges))
+        for _ in range(draws):
+            s = np.zeros(N)
+            s[rng.choice(sink_pool, k, replace=False)] = -1.0
+            s[source] += k
+            Q2 += link_flows(edges, C, solve_pressure(edges, C, s)) ** 2
+        C = adapt(C, Q2 / draws, nu, gamma, dt)
     return edges, C
 
 

@@ -9,6 +9,7 @@ from pattern_formation.networks import (
     adapt,
     count_loops,
     relax,
+    relax_fluctuating,
 )
 
 N_SIDE = 11
@@ -53,3 +54,9 @@ def test_concave_cost_gives_a_tree_convex_cost_keeps_loops():
         edges, C = relax(N_SIDE, CENTRE, SINKS, gamma=gamma, steps=8000)
         loops = count_loops(edges, C, N, 1e-3 * C.max())
         assert (loops == 0) == expect_tree
+
+
+def test_moving_load_keeps_loops_even_for_concave_cost():
+    edges, C = relax_fluctuating(N_SIDE, CENTRE, SINKS, gamma=0.5, steps=4000,
+                                 rng=np.random.default_rng(0))
+    assert count_loops(edges, C, N, 1e-3 * C.max()) > 30  # steady load gave 0
