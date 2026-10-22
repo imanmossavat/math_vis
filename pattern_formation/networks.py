@@ -25,6 +25,9 @@ __all__ = [
     "count_loops",
     "relax",
     "relax_fluctuating",
+    "relax_graph",
+    "relax_fluctuating_graph",
+    "masked_grid",
     "draw_network",
 ]
 
@@ -69,33 +72,35 @@ def count_loops(edges, C, N, cutoff):
     return len(keep) - N + n_components
 
 
+def relax_graph(edges, s, nu=1.0, gamma=0.5, dt=0.1, steps=2000, C0=None):
+    """Adapt any connected graph under the steady load ``s`` (sums to zero).  Returns C."""
+    C = np.ones(len(edges)) if C0 is None else C0.copy()
+    for _ in range(steps):
+        p = solve_pressure(edges, C, s)
+        C = adapt(C, link_flows(edges, C, p) ** 2, nu, gamma, dt)
+    return C
+
+
 def relax(n, source, sinks, nu=1.0, gamma=0.5, dt=0.1, steps=2000, C0=None):
-    """Adapt a grid network under a steady load until it settles.
+    """Adapt an n x n grid network under a steady load until it settles.
 
     source : node number where fluid enters.
     sinks : node numbers that drain, sharing the inflow equally.
     Returns (edges, C).
     """
-    N = n * n
-    edges = grid_edges(n)
-    s = np.zeros(N)
+    s = np.zeros(n * n)
     s[sinks] = -1.0
     s[source] += len(sinks)
-    C = np.ones(len(edges)) if C0 is None else C0.copy()
-    for _ in range(steps):
-        p = solve_pressure(edges, C, s)
-        C = adapt(C, link_flows(edges, C, p) ** 2, nu, gamma, dt)
-    return edges, C
+    edges = grid_edges(n)
+    return edges, relax_graph(edges, s, nu, gamma, dt, steps, C0)
 
 
-def relax_fluctuating(n, source, sink_pool, k=5, draws=3, nu=1.0, gamma=0.5,
-                      dt=0.1, steps=2000, rng=None, C0=None):
-    """Like :func:`relax`, but the load moves: each step averages Q^2 over ``draws``
-    random choices of ``k`` active sinks from ``sink_pool`` (each drains 1 unit).
+def relax_fluctuating_graph(edges, N, source, sink_pool, k=5, draws=3, nu=1.0,
+                            gamma=0.5, dt=0.1, steps=2000, rng=None, C0=None):
+    """Moving load on any graph: each step averages Q^2 over ``draws`` random
+    choices of ``k`` active sinks from ``sink_pool`` (each drains 1 unit).  Returns C.
     """
     rng = rng or np.random.default_rng()
-    N = n * n
-    edges = grid_edges(n)
     C = np.ones(len(edges)) if C0 is None else C0.copy()
     for _ in range(steps):
         Q2 = np.zeros(len(edges))
@@ -105,7 +110,41 @@ def relax_fluctuating(n, source, sink_pool, k=5, draws=3, nu=1.0, gamma=0.5,
             s[source] += k
             Q2 += link_flows(edges, C, solve_pressure(edges, C, s)) ** 2
         C = adapt(C, Q2 / draws, nu, gamma, dt)
+    return C
+
+
+def relax_fluctuating(n, source, sink_pool, k=5, draws=3, nu=1.0, gamma=0.5,
+                      dt=0.1, steps=2000, rng=None, C0=None):
+    """Like :func:`relax`, but the load moves (see :func:`relax_fluctuating_graph`)."""
+    edges = grid_edges(n)
+    C = relax_fluctuating_graph(edges, n * n, source, sink_pool, k, draws, nu,
+                                gamma, dt, steps, rng, C0)
     return edges, C
+
+
+def masked_grid(mask):
+    """Grid graph on the True pixels of ``mask[iy, ix]`` (largest connected piece only).
+
+    Returns (xy, edges): pixel coordinates (x, y) of each node, and 4-neighbour links
+    numbered 0..N-1, ready for :func:`relax_graph`.
+    """
+    ids = -np.ones(mask.shape, dtype=int)
+    ids[mask] = np.arange(mask.sum())
+    pairs = []
+    for a, b in [(ids[:, :-1], ids[:, 1:]), (ids[:-1, :], ids[1:, :])]:
+        ok = (a >= 0) & (b >= 0)
+        pairs.append(np.stack([a[ok], b[ok]], axis=1))
+    edges = np.vstack(pairs)
+    iy, ix = np.nonzero(mask)
+    xy = np.stack([ix, iy], axis=1).astype(float)
+    N = len(xy)
+    graph = sp.coo_matrix((np.ones(len(edges)), (edges[:, 0], edges[:, 1])), shape=(N, N))
+    _, label = connected_components(graph, directed=False)
+    keep = label == np.bincount(label).argmax()
+    new_id = -np.ones(N, dtype=int)
+    new_id[keep] = np.arange(keep.sum())
+    edges = new_id[edges[keep[edges[:, 0]]]]
+    return xy[keep], edges
 
 
 def draw_network(ax, n, edges, C, cutoff=0.0, width=4.0, color="k"):
