@@ -3,10 +3,10 @@ import numpy as np
 import pytest
 
 from pattern_formation.networks import (
-    count_loops, link_flows, solve_pressure, relax_graph, masked_grid,
+    count_loops, link_flows, solve_pressure, relax_graph, relax_moving_graph, masked_grid,
 )
 from pattern_formation.venation import (
-    SHAPES, leaf_outline, inside, grow_veins, leaf_grid, murray_widths, vein_stats,
+    SHAPES, leaf_outline, inside, grow_veins, leaf_grid, leaf_mesh, murray_widths, vein_stats,
 )
 
 POLY = leaf_outline("ovate")
@@ -62,3 +62,37 @@ def test_flow_widths_follow_conductance_flow_power_law():
         slope = np.polyfit(np.log(Q[k]), np.log(C[k]), 1)[0]
         assert slope == pytest.approx(2 / (gamma + 1), abs=0.03)
         assert count_loops(edges, C, N, 1e-3 * C.max()) == 0
+
+
+@pytest.mark.parametrize("closed", [False, True])
+def test_no_two_vein_nodes_sit_in_the_same_place(closed):
+    # sources pulling a node in opposite directions used to make it stack copies of one child
+    g = grow_veins(POLY, b=0.05, kill=0.02 if not closed else 0.01, closed=closed, steps=120)
+    assert len(g["xy"]) == len(np.unique(g["xy"].round(9), axis=0))
+
+
+def test_leaf_mesh_is_connected_inside_the_leaf_with_about_six_links_per_node():
+    xy, edges, base = leaf_mesh(POLY, 20)
+    N = len(xy)
+    assert inside(POLY, xy).all() and 0 <= base < N
+    assert count_loops(edges, np.ones(len(edges)), N, 0.5) == len(edges) - N + 1  # one piece
+    assert 5.0 < 2 * len(edges) / N < 6.5
+
+
+def test_flow_on_a_leaf_mesh_gives_a_tree_for_steady_load_loops_for_moving_load():
+    # gamma < 1 steady load: a spanning tree (N - 1 links, every node drains).  A moving
+    # load keeps loops at the same gamma; gamma > 1 keeps them even for a steady load.
+    xy, edges, base = leaf_mesh(POLY, 16)
+    N = len(xy)
+    length = np.linalg.norm(xy[edges[:, 0]] - xy[edges[:, 1]], axis=1)
+    sinks = np.array([i for i in range(N) if i != base])
+
+    def settle(alpha, gamma):
+        C = relax_moving_graph(edges, N, base, sinks, alpha, gamma=gamma, dt=0.5, steps=600, length=length)
+        keep = C > 1e-4 * C.max()
+        return keep.sum(), count_loops(edges, C, N, 1e-4 * C.max())
+
+    links, loops = settle(0.0, 0.5)
+    assert (links, loops) == (N - 1, 0)
+    assert settle(1.0, 0.5)[1] > 20
+    assert settle(0.0, 1.2)[1] > 20

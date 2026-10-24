@@ -19,10 +19,10 @@ Lengths are in units of the final leaf length (the leaf is 1 long).
 import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.path import Path
-from scipy.spatial import cKDTree
+from scipy.spatial import Delaunay, cKDTree
 
 from math_vis.utils import make_cmap, fig_to_img
-from pattern_formation.networks import count_loops, masked_grid
+from pattern_formation.networks import count_loops, largest_piece, masked_grid
 
 
 __all__ = [
@@ -32,6 +32,7 @@ __all__ = [
     "inside",
     "grow_veins",
     "leaf_grid",
+    "leaf_mesh",
     "murray_widths",
     "vein_stats",
     "draw_veins",
@@ -126,7 +127,11 @@ def _grow_step(xy, src, closed, kill, step):
     np.add.at(total, ni, vec)
     norm = np.linalg.norm(total, axis=1)
     grow = np.nonzero(norm > 1e-9)[0]
-    return grow, xy[grow] + step * total[grow] / norm[grow, None]
+    pos = xy[grow] + step * total[grow] / norm[grow, None]
+    # Opposed pulls make a node step sideways, no closer to any source; it would then
+    # step to the same spot every iteration.  Do not stack nodes.
+    fresh = cKDTree(xy).query(pos)[0] > 0.5 * step
+    return grow[fresh], pos[fresh]
 
 
 def _kill_sources(xy, src, age, closed, kill, max_age):
@@ -209,6 +214,30 @@ def leaf_grid(poly, rows=30):
     xy = np.stack([xs[pix[:, 0].astype(int)], ys[pix[:, 1].astype(int)]], axis=1)
     base = int(np.argmin(np.hypot(xy[:, 0], xy[:, 1] - h)))
     return xy, edges, base
+
+
+def leaf_mesh(poly, rows=28, jitter=0.35, seed=0):
+    """The leaf as an irregular mesh: jittered triangular points joined by a Delaunay graph.
+
+    A square or triangular lattice makes paths run along its own directions; a jittered
+    mesh does not.  About ``rows`` points along the leaf's length.  Returns (xy, edges,
+    base): positions, links (nodes about 6 links each), and the node nearest the leaf base.
+    Link lengths are ``np.linalg.norm(xy[e0] - xy[e1])``; pass them as ``length`` to the
+    flow functions in ``networks.py``.
+    """
+    rng = np.random.default_rng(seed)
+    dy = 1.0 / rows
+    a = 2 * dy / np.sqrt(3)  # spacing of the triangular lattice that is jittered
+    J, M = np.meshgrid(np.arange(rows + 2), np.arange(-int(1 / a) - 2, int(1 / a) + 3), indexing="ij")
+    pts = np.stack([M * a / 2, (J + 0.5) * dy], axis=-1)[(J + M) % 2 == 0]
+    pts = pts + rng.uniform(-jitter * a, jitter * a, pts.shape)
+    pts = pts[inside(poly, pts)]
+    tri = Delaunay(pts).simplices
+    edges = np.unique(np.sort(np.vstack([tri[:, [0, 1]], tri[:, [1, 2]], tri[:, [0, 2]]]), axis=1), axis=0)
+    long = np.linalg.norm(pts[edges[:, 0]] - pts[edges[:, 1]], axis=1) > 2.2 * a
+    edges = edges[inside(poly, pts[edges].mean(axis=1)) & ~long]  # no links outside the leaf
+    xy, edges = largest_piece(pts, edges)
+    return xy, edges, int(np.argmin(np.hypot(xy[:, 0], xy[:, 1] - dy / 2)))
 
 
 # --- widths and measurements -------------------------------------------------
