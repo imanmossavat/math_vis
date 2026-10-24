@@ -21,6 +21,7 @@ from matplotlib.collections import LineCollection
 from matplotlib.path import Path
 from scipy.spatial import Delaunay, cKDTree
 
+from math_vis.rendering import glass_lines
 from math_vis.utils import make_cmap, fig_to_img
 from pattern_formation.networks import count_loops, largest_piece, masked_grid
 
@@ -37,6 +38,7 @@ __all__ = [
     "vein_stats",
     "draw_veins",
     "render_veins",
+    "render_vein_glass",
 ]
 
 SHAPES = ("ovate", "elliptic", "lanceolate", "round", "lobed")
@@ -312,3 +314,35 @@ def render_veins(xy, edges, width, poly, size=(4.2, 5.6), dpi=200, **kw):
     ax.set_position([0, 0, 1, 1])
     draw_veins(ax, xy, edges, width, poly, **kw)
     return fig_to_img(fig, dpi=dpi)
+
+
+GLASS = ["#0b1d3a", "#1f4e8c", "#2aa5c9", "#58d3c0", "#f4e285",
+         "#f59e3b", "#e0453a", "#8e2a6a", "#3a1d6e"]
+
+
+def render_vein_glass(xy, edges, width, poly, height=900, cutoff=0.0, lead=(1.0, 9.0),
+                      power=1.0, margin=3.0, palette=None, seed=0, stages=False, **glass_kw):
+    """Draw a vein network as backlit stained glass: veins are the lead, areoles the panes.
+
+    ``lead`` = (thinnest, thickest) lead half-width in pixels; a vein of width w gets
+    thinnest + (thickest - thinnest) * (w / w_max) ** power.  Links <= ``cutoff`` are hidden.
+    The leaf margin is lead ``margin`` px wide.  ``glass_kw`` go to :func:`glass_lines`.
+    """
+    pad = 0.04
+    lo, hi = poly.min(axis=0) - pad, poly.max(axis=0) + pad
+    s = height / (hi[1] - lo[1])
+    W, H = int(np.ceil((hi[0] - lo[0]) * s)), height
+
+    def px(p):
+        return np.column_stack([(p[:, 0] - lo[0]) * s, (hi[1] - p[:, 1]) * s])
+
+    keep = width > cutoff
+    segs = px(xy)[edges[keep]]
+    hw = lead[0] + (lead[1] - lead[0]) * (width[keep] / width.max()) ** power
+    ring = px(np.vstack([poly, poly[:1]]))
+    segs = np.concatenate([segs, np.stack([ring[:-1], ring[1:]], axis=1)])
+    hw = np.concatenate([hw, np.full(len(ring) - 1, margin)])
+    X, Y = np.meshgrid(np.arange(W) + 0.5, np.arange(H) + 0.5)
+    leaf = inside(ring, np.column_stack([X.ravel(), Y.ravel()])).reshape(H, W)
+    return glass_lines(segs, hw, make_cmap(palette or GLASS), W, H, inside=leaf,
+                       rng=np.random.default_rng(seed), stages=stages, **glass_kw)

@@ -101,6 +101,8 @@ Call `mv.finish(...)` again when you want extra vignette, to save, or to display
 | Build patterns from simple tiles | `demo_truchet.ipynb` | Truchet matchings, orientation fields, and multi-strand ribbons. |
 | Voronoi cells with crisp lead | `demo_stained_glass_crisp.ipynb` | Lloyd relaxation, cell colors, streaks, cracks, and rounded lead. |
 | Radial symmetry and soft glass glow | `demo_glass_rose.ipynb` | Rose-window seed layouts and the facet/glow lighting model. |
+| One point set, four graphs | `demo_proximity_graphs.ipynb` | Delaunay, Gabriel, relative-neighbour graph and MST nest; how they link the glass and the vein demos. |
+| Veins as leaded glass | `demo_vein_glass.ipynb` | Vein networks lit with the glass recipe; panes = loops + 1. |
 | A declarative drawing language | `demo_drawing_language.ipynb` | Layouts, isolated seeds, walks, and reusable layers. |
 | Basins of attraction and Newton fractals | `demo_basins.ipynb` | Fixed points, basins, settling times, metrics, and precision. |
 

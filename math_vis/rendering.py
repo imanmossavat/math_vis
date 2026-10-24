@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
+from scipy.ndimage import distance_transform_edt, label
 from scipy.spatial import cKDTree
 
 from .utils import make_cmap, upfield, fig_to_img, squash, new_rng
@@ -255,6 +256,121 @@ def glass_crisp(
         snap["leaded"] = np.clip(rgb, 0, 255).astype(np.uint8)
     snap["final"] = np.clip(rgb, 0, 255).astype(np.uint8)
     return (rgb.astype(np.float32), snap) if stages else rgb.astype(np.float32)
+
+
+def line_distance(segs, half_width, W, H, levels=12):
+    """Distance (px) from every pixel to the surface of thick segments; < 0 inside a line.
+
+    ``segs`` (E, 2, 2) in pixel coordinates (x, y), ``half_width`` (E,) in pixels.
+    Widths are rounded to ``levels`` values and one distance transform is done per value.
+    """
+    half_width = np.broadcast_to(np.asarray(half_width, float), len(segs))
+    edges = np.linspace(half_width.min(), half_width.max(), levels + 1)
+    level = np.clip(np.searchsorted(edges, half_width) - 1, 0, levels - 1)
+    out = np.full((H, W), np.inf, dtype=np.float32)
+    for k in np.unique(level):
+        sk = segs[level == k]
+        n = np.maximum(2, np.ceil(2 * np.linalg.norm(sk[:, 1] - sk[:, 0], axis=1)).astype(int))
+        t = np.concatenate([np.linspace(0, 1, m) for m in n])
+        a, b = np.repeat(sk[:, 0], n, axis=0), np.repeat(sk[:, 1], n, axis=0)
+        x, y = (a + t[:, None] * (b - a)).T
+        ok = (x >= 0) & (x < W) & (y >= 0) & (y < H)
+        centre = np.ones((H, W), bool)
+        centre[y[ok].astype(int), x[ok].astype(int)] = False
+        hw = half_width[level == k].mean()
+        out = np.minimum(out, distance_transform_edt(centre) - hw)
+    return out
+
+
+def glass_lines(
+    segs,
+    half_width,
+    palette,
+    W,
+    H,
+    *,
+    inside=None,
+    rng=None,
+    trend=0.4,
+    smooth=18,
+    jitter=0.06,
+    facet=0.35,
+    glow=0.35,
+    cell_var=0.08,
+    lead_px=1.5,
+    lead_var=0.35,
+    bevel=0.35,
+    lead_color=(14, 11, 18),
+    texture=0.05,
+    bloom=0.25,
+    min_pane=10,
+    stages=False,
+):
+    """Stained glass whose lead is a given set of thick lines (veins, cracks, roads).
+
+    The panes are the faces the lines enclose (inside the boolean ``inside`` mask).
+    Lighting follows :func:`glass`, with the distance to the lead in place of the
+    distance to a seed.  Panes under ``min_pane`` pixels (slivers where lines meet) are
+    filled with lead.  Returns the image, or (image, stages) with ``stages=True``;
+    ``stages["panes"]`` is the number of panes.
+    """
+    rng = rng or np.random.default_rng()
+    snap = {}
+    inside = np.ones((H, W), bool) if inside is None else inside
+    d = line_distance(segs, half_width, W, H)
+    cell, n = label(inside & (d > 0))
+    small = np.bincount(cell.ravel(), minlength=n + 1) < min_pane
+    small[0] = False
+    d[small[cell]] = -1.0
+    cell, n = label(inside & (d > 0))
+    pane = cell.ravel() > 0
+    cell = np.maximum(cell.ravel() - 1, 0)
+    snap["panes"] = n
+
+    # per-pane geometry
+    X, Y = np.meshgrid(np.arange(W, dtype=np.float32) + 0.5, np.arange(H, dtype=np.float32) + 0.5)
+    P = np.column_stack([X.ravel(), Y.ravel()])
+    w = pane.astype(float)
+    cnt = np.maximum(np.bincount(cell, weights=w, minlength=n), 1)
+    cen = np.column_stack([np.bincount(cell, weights=w * P[:, i], minlength=n) for i in (0, 1)]) / cnt[:, None]
+    R = np.sqrt(cnt / np.pi)[cell]
+    dist = np.maximum(d.ravel(), 0)
+    dmax = np.ones(n)
+    np.maximum.at(dmax, cell[pane], dist[pane])
+
+    # color
+    t_cell = cell_colors(cen, W, H, rng, trend=trend, smooth=smooth, jitter=jitter)
+    rgb = palette(t_cell[cell])[:, :3].astype(np.float32) * 255
+    lead = np.array(lead_color, dtype=np.float32)
+    rgb[~pane] = lead
+    if stages:
+        snap["flat"] = rgb.reshape(H, W, 3).astype(np.uint8)
+
+    # lighting: tilt, thicker glass glows in the middle of a pane, pane-to-pane variation
+    ang = rng.uniform(0, 2 * np.pi, n)
+    f = np.einsum("ij,ij->i", P - cen[cell], np.column_stack([np.cos(ang), np.sin(ang)])[cell]) / R
+    f = np.clip(f, -1, 1)  # long thin panes would otherwise tilt far out of range
+    light = 1 + facet * f + glow * (dist / dmax[cell] - 0.55) + cell_var * rng.uniform(-1, 1, n)[cell]
+    rgb[pane] *= light[pane, None]
+    if stages:
+        snap["lit"] = np.clip(rgb, 0, 255).reshape(H, W, 3).astype(np.uint8)
+
+    # lead: the lines themselves, softened over lead_px, and everything outside ``inside``
+    zero = np.zeros_like(dist)
+    e2 = np.where(inside.ravel(), 2 * dist, 0)
+    rgb = apply_lead_lines(rgb, zero, e2, W, H, lead_px=lead_px, lead_var=lead_var,
+                           lead_color=lead_color, bevel=bevel, rng=rng)
+    if stages:
+        snap["leaded"] = np.clip(rgb, 0, 255).reshape(H, W, 3).astype(np.uint8)
+
+    if texture > 0:
+        alpha = 1 - np.clip(e2 / 2 / lead_px, 0, 1)
+        rgb = apply_texture(rgb, alpha, W, H, rng=rng, texture=texture)
+    img = np.clip(rgb, 0, 255).reshape(H, W, 3)
+    if bloom > 0:
+        img = apply_bloom(img, bloom=bloom)
+    snap["final"] = img.astype(np.uint8)
+    return (img.astype(np.float32), snap) if stages else img.astype(np.float32)
 
 
 # ---------- Truchet tile library ----------

@@ -1,7 +1,9 @@
 """Mathematical primitives: fields, sampling, geometry, seed layouts."""
 import numpy as np
 from scipy.ndimage import gaussian_filter, map_coordinates
-from scipy.spatial import cKDTree
+from scipy.sparse import coo_matrix
+from scipy.sparse.csgraph import minimum_spanning_tree
+from scipy.spatial import Delaunay, cKDTree
 
 
 def smooth_field(shape, sigma, rng=None):
@@ -188,3 +190,52 @@ def matchings(idx):
             for right in matchings(idx[k + 1 :]):
                 out.append([(first, idx[k])] + left + right)
     return out
+
+
+# ---------- Proximity graphs: MST ⊆ RNG ⊆ Gabriel ⊆ Delaunay ----------
+
+
+def delaunay_edges(pts):
+    """Links of the Delaunay triangulation (dual of the Voronoi diagram), (E, 2) sorted."""
+    tri = Delaunay(pts).simplices
+    e = np.vstack([tri[:, [0, 1]], tri[:, [1, 2]], tri[:, [0, 2]]])
+    return np.unique(np.sort(e, axis=1), axis=0)
+
+
+def gabriel_edges(pts, edges):
+    """Keep links whose diametral disc holds no other point."""
+    a, b = pts[edges[:, 0]], pts[edges[:, 1]]
+    r = np.linalg.norm(a - b, axis=1) / 2
+    d, _ = cKDTree(pts).query((a + b) / 2)  # nearest point to the midpoint
+    return edges[d >= r * (1 - 1e-9)]
+
+
+def rng_edges(pts, edges):
+    """Relative neighbourhood graph: keep links (a, b) with no c closer to both a and b."""
+    tree = cKDTree(pts)
+    L = np.linalg.norm(pts[edges[:, 0]] - pts[edges[:, 1]], axis=1)
+    keep = np.ones(len(edges), bool)
+    for k, (i, j) in enumerate(edges):
+        # the lune lies inside the disc of radius L*sqrt(3)/2 about the midpoint
+        near = tree.query_ball_point((pts[i] + pts[j]) / 2, L[k] * 0.8661)
+        c = pts[[n for n in near if n != i and n != j]]
+        if len(c):
+            far = np.maximum(np.linalg.norm(c - pts[i], axis=1), np.linalg.norm(c - pts[j], axis=1))
+            keep[k] = not (far < L[k] * (1 - 1e-9)).any()
+    return edges[keep]
+
+
+def mst_edges(pts, edges):
+    """Euclidean minimum spanning tree, found among ``edges`` (Delaunay is enough)."""
+    L = np.linalg.norm(pts[edges[:, 0]] - pts[edges[:, 1]], axis=1)
+    n = len(pts)
+    t = minimum_spanning_tree(coo_matrix((L, (edges[:, 0], edges[:, 1])), shape=(n, n))).tocoo()
+    return np.sort(np.column_stack([t.row, t.col]), axis=1)
+
+
+def proximity_graphs(pts):
+    """The chain on one point set: dict delaunay, gabriel, rng, mst (each a subset of the last)."""
+    de = delaunay_edges(pts)
+    ga = gabriel_edges(pts, de)
+    rn = rng_edges(pts, ga)
+    return dict(delaunay=de, gabriel=ga, rng=rn, mst=mst_edges(pts, rn))

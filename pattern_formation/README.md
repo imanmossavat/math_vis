@@ -5,9 +5,9 @@ Experiments where each result is checked against a number a calculation predicte
 
 - `reaction_diffusion.py` — Gray-Scott simulation, spacing measurement, rendering.
 - `networks.py` — adaptive flow networks (Hu-Cai type): pressure solve (optional link lengths), implicit conductance adaptation, steady and exactly averaged moving load (Klemm-Martens alpha), loop counting, drawing.
-- `venation.py` — leaf venation by space colonization (open/closed), Murray widths, leaf outlines, leaf meshes (`leaf_mesh`: jittered Delaunay; `leaf_grid`: square) and vein drawing shared with `networks.py`.
+- `venation.py` — leaf venation by space colonization (open/closed), Murray widths, leaf outlines, leaf meshes (`leaf_mesh`: jittered Delaunay; `leaf_grid`: square) and vein drawing shared with `networks.py`; `render_vein_glass` draws a network as leaded glass (veins = lead, areoles = panes).
 - `tests/` — verified phenomena (e.g. equal diffusion gives no pattern; spacing scales with sqrt(D)).
 
 Rule: `pattern_formation` may import from `math_vis`; nothing in `math_vis` imports from `pattern_formation`.
 
-Sources for the models are listed at the end of `notebooks/demo_vein_models.ipynb`.
+Sources for the models are listed at the end of `notebooks/demo_vein_models.ipynb`. `demo_proximity_graphs.ipynb` ties the meshes, the venation rules and the stained glass together (MST ⊆ RNG ⊆ Gabriel ⊆ Delaunay); `demo_vein_glass.ipynb` renders the veins as glass.

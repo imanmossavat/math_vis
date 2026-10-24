@@ -76,3 +76,13 @@ def test_glass_crisp_stages():
     t = mv.cell_colors(seeds, 80, 80, rng)
     img, stages = mv.glass_crisp(seeds, t, mv.make_cmap(["#000", "#fff"]), 80, 80, rng=rng, stages=True)
     assert "flat" in stages and "final" in stages
+
+
+def test_glass_lines_panes_are_the_faces_of_the_lines():
+    # k lines across and k down, edge to edge, cut the image into (k + 1)^2 panes
+    k, W = 3, 120
+    xs = np.arange(1, k + 1) * W / (k + 1)
+    segs = np.array([[[x, 0], [x, W]] for x in xs] + [[[0, y], [W, y]] for y in xs], float)
+    img, stages = mv.glass_lines(segs, 2.0, mv.make_cmap(["#000", "#fff"]), W, W, stages=True)
+    assert stages["panes"] == (k + 1) ** 2
+    assert img.shape == (W, W, 3)

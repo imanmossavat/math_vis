@@ -96,3 +96,39 @@ def test_flow_on_a_leaf_mesh_gives_a_tree_for_steady_load_loops_for_moving_load(
     assert (links, loops) == (N - 1, 0)
     assert settle(1.0, 0.5)[1] > 20
     assert settle(0.0, 1.2)[1] > 20
+
+
+def test_vein_glass_has_one_pane_per_loop_plus_the_outside():
+    # Euler for a planar network: faces = loops + 1.  The flow mesh is Delaunay, so planar.
+    from math_vis import glass_lines, make_cmap
+    xy, edges, base = leaf_mesh(POLY, 16)
+    N = len(xy)
+    length = np.linalg.norm(xy[edges[:, 0]] - xy[edges[:, 1]], axis=1)
+    sinks = np.array([i for i in range(N) if i != base])
+    C = relax_moving_graph(edges, N, base, sinks, 1.0, gamma=0.5, dt=0.5, steps=400, length=length)
+    keep = C > 1e-4 * C.max()
+    px = np.column_stack([(xy[:, 0] + 0.55) * 800, (1.05 - xy[:, 1]) * 800])
+    _, st = glass_lines(px[edges[keep]], 0.8, make_cmap(["#000", "#fff"]), 880, 880, stages=True)
+    assert st["panes"] == count_loops(edges, C, N, 1e-4 * C.max()) + 1
+
+
+def test_steady_flow_tree_is_a_shortest_path_tree_not_a_minimum_spanning_tree():
+    # At gamma = 1 a settled pipe has C = |Q|, so the energy is sum(l |Q|): each sink is fed
+    # along its shortest path.  Just below 1 the tree's paths are shortest paths; the MST's are not.
+    import scipy.sparse as sp
+    from scipy.sparse.csgraph import dijkstra
+    from math_vis import mst_edges
+
+    xy, edges, base = leaf_mesh(POLY, 16)
+    N = len(xy)
+    length = np.linalg.norm(xy[edges[:, 0]] - xy[edges[:, 1]], axis=1)
+    sinks = np.array([i for i in range(N) if i != base])
+    C = relax_moving_graph(edges, N, base, sinks, 0.0, gamma=0.9, dt=0.5, steps=600, length=length)
+
+    def mean_path(e):
+        w = np.linalg.norm(xy[e[:, 0]] - xy[e[:, 1]], axis=1)
+        return dijkstra(sp.coo_matrix((w, (e[:, 0], e[:, 1])), shape=(N, N)), directed=False, indices=base).mean()
+
+    shortest = mean_path(edges)
+    assert mean_path(edges[C > 1e-4 * C.max()]) / shortest < 1.005
+    assert mean_path(mst_edges(xy, edges)) / shortest > 1.5

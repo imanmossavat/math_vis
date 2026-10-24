@@ -82,3 +82,52 @@ def test_cubic_bezier_scales_with_coordinates():
     curve = mv.cubic_bezier(p, q, n=20, max_offset=None)
     curve_scaled = mv.cubic_bezier(1000 * p, 1000 * q, n=20, max_offset=None)
     np.testing.assert_allclose(curve_scaled, 1000 * curve)
+
+
+def _brute_rng_and_gabriel(p):
+    rng, gab = set(), set()
+    for i in range(len(p)):
+        for j in range(i + 1, len(p)):
+            others = np.delete(np.arange(len(p)), [i, j])
+            L = np.linalg.norm(p[i] - p[j])
+            far = np.maximum(np.linalg.norm(p[others] - p[i], axis=1), np.linalg.norm(p[others] - p[j], axis=1))
+            if (far >= L).all():
+                rng.add((i, j))
+            if (np.linalg.norm(p[others] - (p[i] + p[j]) / 2, axis=1) >= L / 2).all():
+                gab.add((i, j))
+    return rng, gab
+
+
+def test_proximity_graphs_match_brute_force_and_nest():
+    # MST ⊆ RNG ⊆ Gabriel ⊆ Delaunay; RNG and Gabriel checked against every pair
+    p = np.random.default_rng(0).random((60, 2))
+    g = mv.proximity_graphs(p)
+    s = {k: set(map(tuple, v)) for k, v in g.items()}
+    rng, gab = _brute_rng_and_gabriel(p)
+    assert s["rng"] == rng and s["gabriel"] == gab
+    assert s["mst"] <= s["rng"] <= s["gabriel"] <= s["delaunay"]
+
+
+def test_proximity_graph_link_counts():
+    # Delaunay: 3N - 3 - h links (h points on the hull, Euler).  MST: N - 1.
+    # Random points: mean Gabriel degree 4 (Matula and Sokal 1980), Delaunay 6.
+    from scipy.spatial import ConvexHull
+    deg = {"delaunay": [], "gabriel": []}
+    for seed in range(4):
+        p = np.random.default_rng(seed).random((3000, 2))
+        g = mv.proximity_graphs(p)
+        h = len(ConvexHull(p).vertices)
+        assert len(g["delaunay"]) == 3 * len(p) - 3 - h
+        assert len(g["mst"]) == len(p) - 1
+        inner = (np.abs(p - 0.5) < 0.4).all(axis=1)
+        for k in deg:
+            deg[k].append(np.bincount(g[k].ravel(), minlength=len(p))[inner].mean())
+    assert abs(np.mean(deg["delaunay"]) - 6) < 0.03
+    assert abs(np.mean(deg["gabriel"]) - 4) < 0.06
+
+
+def test_lloyd_relaxation_pushes_gabriel_toward_delaunay():
+    p = np.random.default_rng(1).random((1500, 2)) * 1000
+    before = len(mv.proximity_graphs(p)["gabriel"])
+    after = len(mv.proximity_graphs(mv.lloyd_relaxation(p, 1000, 1000, iters=10))["gabriel"])
+    assert after > 1.25 * before
